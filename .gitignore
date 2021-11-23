@@ -1,8 +1,8 @@
 censusdivisions.png
+Data/acs/
 csv/
-Data/
+Data/csv/
 .Rproj.user
-*.csv
 .Rhistory
 cse_8800/
 Rpl*.png
