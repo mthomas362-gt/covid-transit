@@ -4,7 +4,7 @@ library(lme4)
 library(corrplot)
 source("readin-data.R")
 
-cv_responses_cbsa_agg_tr <- readin_data(TRAIN)
+cv_responses_cbsa_agg_tr <- readin_data(TRAIN, T)
 
 glue::glue("You read in {count(distinct(cv_responses_cbsa_agg_tr, CBSA))} MSAs")
 
@@ -84,10 +84,38 @@ summary(nb_model)
 
 exp(confint(nb_model))
 
+# Full Model (Neg Binom test interaction----
+# 
+# AIC(nb_model)
+# 
+# summary(glmer.nb(data = cv_responses_cbsa_nd_tr_sc, formula = Total_Cases ~  Daily_or_Week +
+#            pct_poverty + occupants_few_1 + educ_hs_grad + Daily_or_Week * educ_hs_grad + (1|Region) + offset(log(POPESTIMATE2019))))
+# 
+# summary(glmer.nb(data = cv_responses_cbsa_nd_tr_sc, formula = Total_Cases ~  Daily_or_Week +
+#            pct_poverty + occupants_few_1 + educ_hs_grad + Daily_or_Week * occupants_few_1 + (1|Region) + offset(log(POPESTIMATE2019))))
+# 
+# summary(glmer.nb(data = cv_responses_cbsa_nd_tr_sc, formula = Total_Cases ~  Daily_or_Week +
+#            pct_poverty + occupants_few_1 + educ_hs_grad + Daily_or_Week * pct_poverty + (1|Region) + offset(log(POPESTIMATE2019))))
+
 # These are the estimated negative binomial regression coefficients for the 
 # model. Recall that the dependent variable is a count variable that is either 
 # over- or under-dispersed, and the model models the log of the expected count 
 # as a function of the predictor variables
+
+# Full Model (Neg Binom ~NY)------------
+
+rescale <- function(x) (x - mean(x)) / sd(x)
+
+cv_responses_cbsa_nd_tr_sc_ny <- cv_responses_cbsa_nd_tr %>% 
+  mutate(across(c(Daily_or_Week, pct_poverty, occupants_few_1, educ_hs_grad), rescale))  %>% 
+  filter(!grepl("New York", CBSA))
+
+nb_model <- glmer.nb(data = cv_responses_cbsa_nd_tr_sc_ny, formula = Total_Cases ~  Daily_or_Week +
+                       pct_poverty + occupants_few_1 + educ_hs_grad + (1|Region) + offset(log(POPESTIMATE2019)))
+
+summary(nb_model)
+
+exp(confint(nb_model))
 
 # BUS------------------------------------------------------------------------
 
@@ -160,4 +188,31 @@ summary(nb_model)
 
 exp(confint(nb_model))
 
-# Interpret CI for 
+# Full Model (Neg Binom ~NY)------------
+
+rescale <- function(x) (x - mean(x)) / sd(x)
+
+cv_responses_cbsa_nd_bus_sc_ny <- cv_responses_cbsa_nd_bus %>% 
+  mutate(across(c(Daily_or_Week, pct_poverty, occupants_few_1, educ_hs_grad), rescale))  %>% 
+  filter(!grepl("New York", CBSA))
+
+nb_model <- glmer.nb(data = cv_responses_cbsa_nd_bus_sc_ny, formula = Total_Cases ~  Daily_or_Week +
+                       pct_poverty + occupants_few_1 + educ_hs_grad + (1|Region) + offset(log(POPESTIMATE2019)))
+
+summary(nb_model)
+
+exp(confint(nb_model))
+
+# Full Model (Neg Binom test interaction----
+# 
+# AIC(nb_model)
+# 
+summary(glmer.nb(data = cv_responses_cbsa_nd_bus_sc, formula = Total_Cases ~  Daily_or_Week +
+           pct_poverty + occupants_few_1 + educ_hs_grad + Daily_or_Week * educ_hs_grad + (1|Region) + offset(log(POPESTIMATE2019))))
+
+summary(glmer.nb(data = cv_responses_cbsa_nd_bus_sc, formula = Total_Cases ~  Daily_or_Week +
+           pct_poverty + occupants_few_1 + educ_hs_grad + Daily_or_Week * occupants_few_1 + (1|Region) + offset(log(POPESTIMATE2019))))
+
+summary(glmer.nb(data = cv_responses_cbsa_nd_bus_sc, formula = Total_Cases ~  Daily_or_Week +
+           pct_poverty + occupants_few_1 + educ_hs_grad + Daily_or_Week * pct_poverty + (1|Region) + offset(log(POPESTIMATE2019))))
+

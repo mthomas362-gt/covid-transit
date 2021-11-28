@@ -3,7 +3,7 @@ library(here)
 library(lme4)
 source("readin-data.R")
 
-cv_responses_cbsa_agg_tr <- readin_data(TRAIN)
+cv_responses_cbsa_agg_tr <- readin_data(TRAIN, T)
 
 glue::glue("You read in {count(distinct(cv_responses_cbsa_agg_tr, CBSA))} MSAs")
 
