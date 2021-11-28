@@ -82,6 +82,8 @@ nb_model <- glmer.nb(data = cv_responses_cbsa_nd_tr_sc, formula = Total_Cases ~ 
 
 summary(nb_model)
 
+confint(nb_model)
+
 exp(confint(nb_model))
 
 # Full Model (Neg Binom test interaction----
@@ -114,6 +116,8 @@ nb_model <- glmer.nb(data = cv_responses_cbsa_nd_tr_sc_ny, formula = Total_Cases
                        pct_poverty + occupants_few_1 + educ_hs_grad + (1|Region) + offset(log(POPESTIMATE2019)))
 
 summary(nb_model)
+
+confint(nb_model)
 
 exp(confint(nb_model))
 
@@ -186,6 +190,8 @@ nb_model <- glmer.nb(data = cv_responses_cbsa_nd_bus_sc, formula = Total_Cases ~
 
 summary(nb_model)
 
+confint(nb_model)
+
 exp(confint(nb_model))
 
 # Full Model (Neg Binom ~NY)------------
@@ -200,6 +206,8 @@ nb_model <- glmer.nb(data = cv_responses_cbsa_nd_bus_sc_ny, formula = Total_Case
                        pct_poverty + occupants_few_1 + educ_hs_grad + (1|Region) + offset(log(POPESTIMATE2019)))
 
 summary(nb_model)
+
+confint(nb_model)
 
 exp(confint(nb_model))
 
