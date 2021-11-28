@@ -6,7 +6,7 @@ library(roll)
 source(here("acs-api.R"))
 source(here("helper_functions", "lookup_tables.R"))
 
-readin_data <- function(transit_var) {
+readin_data <- function(transit_var, fill_zero = F) {
   
   # create quoted variable for transit variable  
   transit_var_s <- as_label(enquo(transit_var))
@@ -101,6 +101,13 @@ readin_data <- function(transit_var) {
     prop_by = "HH_CBSA") %>% # Condition on which variable
     as_tibble() %>% 
     mutate(HH_CBSA_c = as.character(HH_CBSA))
+  
+  if(fill_zero == T){
+    response_table <- complete(response_table, 
+                               nesting(HH_CBSA, HH_CBSA_c), 
+                               {{transit_var}}, 
+                               fill = list(W = 0))
+  }
   
   # Join the survey responses to the CBSA crosswalk
   response_table_cross <-  response_table %>% 
