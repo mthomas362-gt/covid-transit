@@ -3,6 +3,7 @@ library(here)
 library(tidyverse)
 source("readin-data.R")
 library(sf)
+library(tmap)
 
 cv_responses_cbsa_agg_tr <- readin_data(TRAIN, T)
 
@@ -45,13 +46,21 @@ plot(st_geometry(usa))
 plot(st_geometry(map_data), add = T,
      col = "red")
 
-# tm_shape(usa_trans) +
-#   tm_boarders() +
-#   tm_shape(map_data) +
-#   tm_polygons(c("Total_Incidence", "pct_poverty", "occupants_few_1", "educ_hs_grad", "Daily_or_Week"))
+tmap_options(check.and.fix = T)
 
 # If you want all of them in the same map you have to pivot_longer
+rescale <- function(x) (x - mean(x)) / sd(x)
+
+map_data_plot <- map_data %>% 
+  mutate(log_total_cases = log(Total_Cases),
+         transit_prop_dayweek = Daily_or_Week) %>%
+  mutate(across(c(log_total_cases, transit_prop_dayweek, pct_poverty, occupants_few_1, educ_hs_grad), rescale)) %>% 
+  pivot_longer(c("log_total_cases", "transit_prop_dayweek", "pct_poverty", "occupants_few_1", "educ_hs_grad"),
+               names_to = "Var", values_to = "Value")
 
 ggplot() +
   geom_sf(data = usa_trans) +
-  geom_sf(data = map_data, mapping = aes(fill = "Total_Incidence"))
+  geom_sf(data = map_data_plot, mapping = aes(fill = Value)) +
+  facet_wrap(~Var)
+
+# BUS-----------------------------
