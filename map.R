@@ -111,14 +111,18 @@ map_data_bus <- us_cbsa %>%
 rescale <- function(x) (x - mean(x)) / sd(x)
 
 map_data_plot_bus <- map_data_bus %>% 
-  mutate(log_total_cases = log(Total_Incidence),
+  mutate(log_total_incidence = log(Total_Incidence),
          transit_prop_dayweek_bus = Daily_or_Week) %>%
   mutate(across(c(log_total_incidence, transit_prop_dayweek_bus, pct_poverty, occupants_few_1, educ_hs_grad), rescale)) %>% 
   pivot_longer(c("log_total_incidence", "transit_prop_dayweek_bus", "pct_poverty", "occupants_few_1", "educ_hs_grad"),
                names_to = "Var", values_to = "Value") %>% 
-  bind_rows(filter(map_data_train, Var == "transit_prop_dayweek_train"))
+  bind_rows(filter(map_data_plot_train, Var == "transit_prop_dayweek_train"))
 
 ggplot() +
   geom_sf(data = usa_trans) +
   geom_sf(data = map_data_plot_bus, mapping = aes(fill = Value)) +
-  facet_wrap(~Var)
+  facet_wrap(~Var) +
+  theme(axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.ticks.y = element_blank()) 
