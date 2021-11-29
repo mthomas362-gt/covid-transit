@@ -160,7 +160,7 @@ readin_data <- function(transit_var, fill_zero = F) {
   cv_responses_small <- cv_responses %>% 
     select(iso2, iso3, FIPS, Admin2, Province_State, HH_CBSA_c, 
             `MSA Type`, {{transit_var}}, W, E, S, Cases, POPESTIMATE2019, Date,
-           pct_poverty, occupants_few_1, educ_hs_grad) %>% 
+           pct_poverty, occupants_few_1, educ_hs_grad, GEOID) %>% 
     mutate(Date_d = lubridate::mdy(Date)) 
   
   # Note: You may have to come back for some of the geographic information
@@ -171,7 +171,7 @@ readin_data <- function(transit_var, fill_zero = F) {
   # Hudson NJ had a decrease in cumulative cases on 6/25
   cv_responses_agg <- cv_responses_small %>% # transformed the date
     arrange({{transit_var}}, FIPS, Date_d) %>% # Sort the observations
-    group_by(HH_CBSA_c, FIPS, {{transit_var}}, W, E, S) %>% # Operate on grouped observations
+    group_by(HH_CBSA_c, FIPS,GEOID, {{transit_var}}, W, E, S) %>% # Operate on grouped observations
     mutate(Daily_Cases = Cases - lag(Cases, default = 0), # Turn cumulative cases to daily cases
            Daily_Cases = ifelse(Daily_Cases < 0, 0, Daily_Cases), # Set negative cases to zero
            Total_Cases = sum(Daily_Cases), # Sum the daily cases within group to produce total cases
@@ -191,7 +191,7 @@ readin_data <- function(transit_var, fill_zero = F) {
   # NOTE: The covariates were already on an MSA level.
   cv_responses_cbsa <- cv_responses_agg %>% 
     select(-iso2, -iso3, -FIPS, -Admin2, -Province_State) %>% 
-    group_by(HH_CBSA_c, `MSA Type`, {{transit_var}}, Date_d,
+    group_by(HH_CBSA_c, GEOID, `MSA Type`, {{transit_var}}, Date_d,
              pct_poverty, occupants_few_1, educ_hs_grad) %>% 
     summarize(W = max(W), # Weights 
               E = max(E), # Estimate
@@ -206,7 +206,7 @@ readin_data <- function(transit_var, fill_zero = F) {
   cv_responses_cbsa_agg <- cv_responses_cbsa %>% # transformed the date
     # Filter dates to only include information from before 5/1
     filter(Date_d < lubridate::make_date(2020,05,01)) %>% 
-    group_by(CBSA, {{transit_var}}) %>% 
+    group_by(CBSA, GEOID, {{transit_var}}) %>% 
     mutate(Daily_Cases = Cases - lag(Cases, default = 0),
            Daily_Cases = ifelse(Daily_Cases < 0, 0, Daily_Cases),
            Total_Cases = sum(Daily_Cases),
