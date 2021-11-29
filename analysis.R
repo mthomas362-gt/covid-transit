@@ -85,7 +85,7 @@ summary(nb_model)
 confint(nb_model)
 
 exp(confint(nb_model))
-
+exp(fixef(nb_model))
 # Full Model (Neg Binom test interaction----
 # 
 # AIC(nb_model)
@@ -210,17 +210,17 @@ summary(nb_model)
 confint(nb_model)
 
 exp(confint(nb_model))
-
+exp(fixef(nb_model))
 # Full Model (Neg Binom test interaction----
 # 
 # AIC(nb_model)
 # 
-summary(glmer.nb(data = cv_responses_cbsa_nd_bus_sc, formula = Total_Cases ~  Daily_or_Week +
-           pct_poverty + occupants_few_1 + educ_hs_grad + Daily_or_Week * educ_hs_grad + (1|Region) + offset(log(POPESTIMATE2019))))
-
-summary(glmer.nb(data = cv_responses_cbsa_nd_bus_sc, formula = Total_Cases ~  Daily_or_Week +
-           pct_poverty + occupants_few_1 + educ_hs_grad + Daily_or_Week * occupants_few_1 + (1|Region) + offset(log(POPESTIMATE2019))))
-
-summary(glmer.nb(data = cv_responses_cbsa_nd_bus_sc, formula = Total_Cases ~  Daily_or_Week +
-           pct_poverty + occupants_few_1 + educ_hs_grad + Daily_or_Week * pct_poverty + (1|Region) + offset(log(POPESTIMATE2019))))
+# summary(glmer.nb(data = cv_responses_cbsa_nd_bus_sc, formula = Total_Cases ~  Daily_or_Week +
+#            pct_poverty + occupants_few_1 + educ_hs_grad + Daily_or_Week * educ_hs_grad + (1|Region) + offset(log(POPESTIMATE2019))))
+# 
+# summary(glmer.nb(data = cv_responses_cbsa_nd_bus_sc, formula = Total_Cases ~  Daily_or_Week +
+#            pct_poverty + occupants_few_1 + educ_hs_grad + Daily_or_Week * occupants_few_1 + (1|Region) + offset(log(POPESTIMATE2019))))
+# 
+# summary(glmer.nb(data = cv_responses_cbsa_nd_bus_sc, formula = Total_Cases ~  Daily_or_Week +
+#            pct_poverty + occupants_few_1 + educ_hs_grad + Daily_or_Week * pct_poverty + (1|Region) + offset(log(POPESTIMATE2019))))
 
