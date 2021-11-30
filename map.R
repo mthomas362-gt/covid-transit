@@ -132,8 +132,9 @@ outlier <- function(x) {
   }
 
 ggplot() +
-  geom_sf(data = usa_trans) +
-  geom_sf(data = map_data_plot_bus, mapping = aes(fill = outlier(Value))) +
+  geom_sf(data = usa_trans, colour = "grey60") +
+  geom_sf(data = map_data_plot_bus, mapping = aes(fill = outlier(Value)),
+          colour = "grey60") +
   facet_wrap(~Var, ncol = 2) +
   theme_bw() +
   theme(axis.text.x=element_blank(),
@@ -143,3 +144,4 @@ ggplot() +
         axis.ticks.y = element_blank()) + 
   scale_fill_continuous(name = "Scaled\nValues")
   # scale_fill_gradient2(limits=c(NA, outlier(map_data_plot_bus$Value)))
+
