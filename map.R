@@ -91,13 +91,13 @@ cv_responses_cbsa_nd_bus <- cv_responses_cbsa_agg_bus %>%
 # county level.
 
 # Read in the CBSA Data 
-us_cbsa <- st_read(here("Data/tl_2019_us_cbsa/","tl_2019_us_cbsa.shp"))
-
-usa <- st_as_sf(maps::map("state", fill=TRUE, plot =FALSE))
-usa_trans <- st_transform(usa, crs = st_crs(us_cbsa))
-
-st_crs(usa_trans)
-st_crs(us_cbsa)
+# us_cbsa <- st_read(here("Data/tl_2019_us_cbsa/","tl_2019_us_cbsa.shp"))
+# 
+# usa <- st_as_sf(maps::map("state", fill=TRUE, plot =FALSE))
+# usa_trans <- st_transform(usa, crs = st_crs(us_cbsa))
+# 
+# st_crs(usa_trans)
+# st_crs(us_cbsa)
 
 map_data_bus <- us_cbsa %>% 
   left_join(cv_responses_cbsa_nd_bus, by = "GEOID") %>% 
@@ -118,11 +118,28 @@ map_data_plot_bus <- map_data_bus %>%
                names_to = "Var", values_to = "Value") %>% 
   bind_rows(filter(map_data_plot_train, Var == "transit_prop_dayweek_train"))
 
+
+outlier <- function(x) {
+  
+  scale_top <- quantile(x, .75) + 1.5 * IQR(x)
+  
+  x <- ifelse(x > scale_top, scale_top, x)
+  
+  x_with_ceiling <- ifelse(x < -scale_top, -scale_top, x)
+  
+  return(x_with_ceiling)
+  
+  }
+
 ggplot() +
   geom_sf(data = usa_trans) +
-  geom_sf(data = map_data_plot_bus, mapping = aes(fill = Value)) +
-  facet_wrap(~Var) +
+  geom_sf(data = map_data_plot_bus, mapping = aes(fill = outlier(Value))) +
+  facet_wrap(~Var, ncol = 2) +
+  theme_bw() +
   theme(axis.text.x=element_blank(),
         axis.text.y=element_blank(),
+        text = element_text(family = "serif"),
         axis.ticks.x = element_blank(),
-        axis.ticks.y = element_blank()) 
+        axis.ticks.y = element_blank()) + 
+  scale_fill_continuous(name = "Scaled\nValues")
+  # scale_fill_gradient2(limits=c(NA, outlier(map_data_plot_bus$Value)))
